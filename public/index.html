@@ -1,696 +1,368 @@
 <!DOCTYPE html>
-
 <html lang="en" class="scroll-smooth">
 
 <head>
-
 <meta charset="UTF-8">
-
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
 <title>Wholesale Catalogue</title>
-
 
 <script src="https://cdn.tailwindcss.com"></script>
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
-
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;1,500&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
 
-
 <script>
-
   tailwind.config = {
-
     theme: {
-
       extend: {
-
         colors: {
-
           brand: {
-
             bg:'#F7F6F3', surface:'#FFFFFF', card:'#EFECE6',
-
             dark:'#1B2340', subtle:'#5B5B5F', green:'#25D366',
-
             accent:'#E8A33D', accentDeep:'#C97F1F', teal:'#1F7A6C'
-
           }
-
         },
-
         fontFamily: {
-
           serif: ['"Playfair Display"','serif'],
-
           sans: ['"Plus Jakarta Sans"','sans-serif'],
-
           mono: ['"IBM Plex Mono"','monospace'],
-
         }
-
       }
-
     }
-
   }
-
 </script>
 
 <style>
-
-  /* ===== Typography scale (design-system tokens) ===== */
-
+  /* ===== Typography scale ===== */
   :root{
-
     --font-h1: clamp(2rem, 4.5vw + 1rem, 3.4rem);
-
     --font-h2: clamp(1.5rem, 2.2vw + 1rem, 2.25rem);
-
     --font-h3: clamp(1.125rem, 1vw + 0.9rem, 1.4rem);
-
     --font-body: clamp(1rem, 0.3vw + 0.9rem, 1.0625rem);
-
     --font-small: clamp(0.8rem, 0.2vw + 0.75rem, 0.875rem);
-
     --font-caption: clamp(0.7rem, 0.15vw + 0.68rem, 0.75rem);
-
   }
-
   .text-h1{ font-size:var(--font-h1); line-height:1.06; }
-
   .text-h2{ font-size:var(--font-h2); line-height:1.15; }
-
   .text-h3{ font-size:var(--font-h3); line-height:1.25; }
-
   .text-body{ font-size:var(--font-body); line-height:1.65; }
-
   .text-small{ font-size:var(--font-small); line-height:1.5; }
-
   .text-caption{ font-size:var(--font-caption); line-height:1.4; }
 
-
-  /* ===== Motion: hover lift, smooth transitions, scroll reveal ===== */
-
+  /* ===== Motion ===== */
   .card-hover{ transition:transform 260ms ease, box-shadow 260ms ease; }
-
   .card-hover:hover{ transform:translateY(-4px); box-shadow:0 16px 32px -12px rgba(27,35,64,0.18); }
-
   .btn-motion{ transition:transform 220ms ease, filter 220ms ease, box-shadow 220ms ease; }
-
   .btn-motion:hover{ transform:translateY(-2px); filter:brightness(1.06); }
-
   .btn-motion:active{ transform:translateY(0); }
-
   a, button{ transition:color 220ms ease, background-color 220ms ease, border-color 220ms ease; }
 
-
   .reveal{ opacity:0; transform:translateY(22px); transition:opacity 550ms ease, transform 550ms ease; }
-
   .reveal.in-view{ opacity:1; transform:translateY(0); }
 
-
   .section-divider{
-
     height:1px; width:100%;
-
     background:linear-gradient(90deg, transparent, rgba(27,35,64,0.14) 20%, rgba(232,163,61,0.35) 50%, rgba(27,35,64,0.14) 80%, transparent);
-
   }
-
   .accent-underline{
-
     position:relative; display:inline-block;
-
   }
-
   .accent-underline::after{
-
     content:''; position:absolute; left:0; bottom:-6px; height:3px; width:36px;
-
     background:linear-gradient(90deg,#E8A33D,#C97F1F); border-radius:2px;
-
   }
 
-
-  #fsZoomContainer{ touch-action:none; }
-
-  #fsZoomImg{ transition:transform 260ms cubic-bezier(.22,.61,.36,1); cursor:grab; user-select:none; will-change:transform; max-height:calc(100vh - 6rem); }
-
-  #fsZoomImg.grabbing{ transition:none; cursor:grabbing; }
-
+  #fsZoomContainer{ touch-action:none; user-select:none; overflow:hidden; }
+  #fsZoomImg{ cursor:grab; user-select:none; will-change:transform; max-height:calc(100vh - 4rem); max-width:90vw; object-fit:contain; }
+  #fsZoomImg.grabbing{ cursor:grabbing; }
   .fs-frame{ padding:1rem; border:1px solid rgba(255,255,255,0.15); border-radius:0.5rem; overflow:hidden; max-width:100%; max-height:100%;
-
-    transition:padding 260ms ease, border-color 260ms ease, border-radius 260ms ease; }
-
+    transition:padding 260ms ease, border-color 260ms ease, border-radius 260ms ease; display:flex; items-center; justify-content:center; }
   .fs-frame.zoomed{ padding:0; border-color:transparent; border-radius:0; overflow:visible; }
 
-  .fs-frame.zoomed #fsZoomImg{ max-height:none; }
-
   #modalTrack img{ width:100%; height:100%; object-fit:contain; flex-shrink:0; pointer-events:none; }
-
   .zoom-btn{ width:34px;height:34px;display:flex;align-items:center;justify-content:center;background:rgba(24,24,27,0.75);color:#fff;border-radius:8px;font-size:1rem; }
-
   .thumb-scroll::-webkit-scrollbar{ height:4px; }
-
   .thumb-scroll::-webkit-scrollbar-thumb{ background:#d4d4d8;border-radius:10px; }
-
   body.modal-lock{ position:fixed; left:0; right:0; overflow:hidden; }
-
   details > summary{ list-style:none; cursor:pointer; }
-
   details > summary::-webkit-details-marker{ display:none; }
-
   details[open] .faq-arrow{ transform:rotate(180deg); }
-
 </style>
-
-
 </head>
 
 <body class="bg-brand-bg text-brand-dark font-sans antialiased">
 
-
 <!-- HEADER -->
-
 <header class="sticky top-0 z-40 bg-brand-bg/90 backdrop-blur-md border-b border-black/5">
-
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between gap-4">
-
     <a href="#" class="flex items-center gap-2 shrink-0">
-
       <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2l2.4 7.2H22l-6 4.4 2.3 7.2L12 16.4 5.7 20.8 8 13.6l-6-4.4h7.6z"/></svg>
-
       <span class="font-serif italic font-semibold text-xl tracking-tight" id="siteLogo">Leaf Star</span>
-
     </a>
-
     <nav class="hidden md:flex items-center gap-8 text-sm font-medium text-brand-subtle">
-
       <a href="#upperwear" class="hover:text-brand-dark">Upperwear</a>
-
       <a href="#lowerwear" class="hover:text-brand-dark">Lowerwear</a>
-
       <a href="#manufacturing" class="hover:text-brand-dark">Manufacturing</a>
-
       <a href="#faq" class="hover:text-brand-dark">FAQ</a>
-
       <a href="#footer" class="hover:text-brand-dark">Contact</a>
-
     </nav>
-
     <a id="headerWaBtn" href="#" target="_blank" rel="noopener"
-
        class="inline-flex items-center gap-2 px-4 sm:px-5 py-2.5 text-xs font-semibold uppercase tracking-wider text-white bg-brand-dark rounded-md hover:bg-black transition-all shrink-0">
-
       <svg class="w-4 h-4 fill-current text-green-400" viewBox="0 0 24 24"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981z"/></svg>
-
       <span class="hidden sm:inline">Start a Conversation</span>
-
       <span class="sm:hidden">WhatsApp</span>
-
     </a>
-
   </div>
-
 </header>
 
-
 <!-- HERO -->
-
 <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-12 sm:pt-16 pb-10 grid grid-cols-1 md:grid-cols-2 gap-10 items-center">
-
   <div>
-
     <span class="text-xs font-bold uppercase tracking-widest text-brand-subtle">Premium B2B Apparel Manufacturer</span>
-
     <h1 class="mt-3 font-sans font-extrabold uppercase tracking-tight text-h1">
-
       Elevate Your Retail Collection With Superior B2B Manufacturing
-
     </h1>
-
     <p class="mt-4 text-sm sm:text-base text-brand-subtle max-w-md">
-
       We manufacture premium menswear for retailers, boutiques, and apparel chains — reliable quality, transparent MOQs, and direct factory pricing.
-
     </p>
-
     <div class="mt-6 flex flex-wrap items-center gap-4">
-
       <a id="heroWaBtn" href="#" target="_blank" rel="noopener" class="btn-motion px-6 py-3 bg-brand-dark text-white text-sm font-semibold rounded-lg hover:bg-black">Start a Conversation</a>
-
       <a href="#gallery" class="text-sm font-semibold underline underline-offset-4 decoration-brand-subtle/50 hover:decoration-brand-dark">Explore Collections →</a>
-
     </div>
-
   </div>
-
   <div class="rounded-3xl overflow-hidden bg-brand-card aspect-[4/3]">
-
-    <img id="heroImg" src="https://images.unsplash.com/photo-1441986300917-64674bd600d8?auto=format&fit=crop&w=800&q=80" alt="Collection preview" class="w-full h-full object-cover">
-
+    <img id="heroImg" src="" alt="Collection preview" class="w-full h-full object-cover hidden">
   </div>
-
 </section>
-
 
 <!-- TRUST STRIP -->
-
 <section class="border-y border-black/5 bg-white">
-
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 grid grid-cols-2 md:grid-cols-4 gap-6 text-sm">
-
     <div class="flex items-center gap-3">
-
       <svg class="w-5 h-5 text-brand-dark shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M9 19v-6a2 2 0 012-2h2a2 2 0 012 2v6m-9 0h14a1 1 0 001-1V10a1 1 0 00-.4-.8l-6-4.5a1 1 0 00-1.2 0l-6 4.5A1 1 0 004 10v8a1 1 0 001 1z"/></svg>
-
       <span class="font-medium">Scalable Production</span>
-
     </div>
-
     <div class="flex items-center gap-3">
-
       <svg class="w-5 h-5 text-brand-dark shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M9 12l2 2 4-4m5 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-
       <span class="font-medium">Strict Quality Assurance</span>
-
     </div>
-
     <div class="flex items-center gap-3">
-
       <svg class="w-5 h-5 text-brand-dark shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M17 9V7a4 4 0 00-8 0v2M5 9h14l1 11H4L5 9z"/></svg>
-
       <span class="font-medium">Wholesale Enquiries Only</span>
-
     </div>
-
     <div class="flex items-center gap-3">
-
       <svg class="w-5 h-5 text-brand-dark shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-
       <span class="font-medium">Reliable Supply Chain</span>
-
     </div>
-
   </div>
-
 </section>
-
 
 <!-- COLLECTION EXPLORER -->
-
 <section id="explorer" class="reveal max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14">
-
   <h2 class="font-sans font-extrabold uppercase tracking-tight text-h2 accent-underline">Collection Explorer</h2>
-
   <p class="text-sm text-brand-subtle mt-2 max-w-xl">Browse by category — jump straight to Upperwear or Lowerwear ranges below.</p>
-
   <div id="explorerGrid" class="mt-8 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4"></div>
-
 </section>
 
-
 <!-- FEATURED PRODUCT GALLERY -->
-
 <section id="gallery" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
-
   <div class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-8">
-
     <div>
-
       <h2 class="font-sans font-extrabold uppercase tracking-tight text-h2 accent-underline">Featured Product Gallery</h2>
-
       <p class="text-sm text-brand-subtle mt-2 max-w-xl">Tap any product to inspect multiple views with full pinch-to-zoom, check specs, and send a pre-filled enquiry to WhatsApp.</p>
-
     </div>
-
     <input id="searchbox" type="text" placeholder="Search products, fabric..."
-
            class="w-full sm:w-64 text-sm bg-white border border-black/10 rounded-full px-4 py-2.5 outline-none focus:ring-2 focus:ring-brand-dark/20 placeholder:text-brand-subtle">
-
   </div>
 
   <main id="catalogRoot" class="space-y-14">
-
     <p class="text-center py-16 text-brand-subtle font-mono text-sm animate-pulse">Loading wholesale catalogue from server...</p>
-
   </main>
 
   <p id="emptyMsg" class="hidden text-center py-16 text-brand-subtle font-mono text-sm">No products match your search.</p>
-
 </section>
-
 
 <!-- MANUFACTURING STORY -->
-
 <section id="manufacturing" class="reveal bg-white border-y border-black/5">
-
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14">
-
     <h2 class="font-sans font-extrabold uppercase tracking-tight text-h2 accent-underline">Manufacturing / Craftsmanship Story</h2>
-
     <p class="text-sm text-brand-subtle mt-2 max-w-xl">From raw fabric to dispatch — every batch passes through five checked stages.</p>
-
     <div class="mt-8 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-5">
-
       <div>
-
         <div class="aspect-square rounded-xl overflow-hidden bg-brand-card"><img src="https://images.unsplash.com/photo-1600166898405-da9535204843?auto=format&fit=crop&w=500&q=80" class="w-full h-full object-cover" loading="lazy" alt="Fabric selection"></div>
-
         <p class="mt-3 text-xs font-bold uppercase tracking-wide">1. Fabric Selection</p>
-
         <p class="text-xs text-brand-subtle mt-1">Sourced from trusted mills for consistent quality.</p>
-
       </div>
-
       <div>
-
         <div class="aspect-square rounded-xl overflow-hidden bg-brand-card"><img src="https://images.unsplash.com/photo-1558021211-6d1403321394?auto=format&fit=crop&w=500&q=80" class="w-full h-full object-cover" loading="lazy" alt="Precision cutting"></div>
-
         <p class="mt-3 text-xs font-bold uppercase tracking-wide">2. Precision Cutting</p>
-
         <p class="text-xs text-brand-subtle mt-1">Pattern-graded, laser-guided for minimal waste.</p>
-
       </div>
-
       <div>
-
         <div class="aspect-square rounded-xl overflow-hidden bg-brand-card"><img src="https://images.unsplash.com/photo-1519744792095-2f2205e87b6f?auto=format&fit=crop&w=500&q=80" class="w-full h-full object-cover" loading="lazy" alt="Expert stitching"></div>
-
         <p class="mt-3 text-xs font-bold uppercase tracking-wide">3. Expert Stitching</p>
-
         <p class="text-xs text-brand-subtle mt-1">Skilled tailors, reinforced seams throughout.</p>
-
       </div>
-
       <div>
-
         <div class="aspect-square rounded-xl overflow-hidden bg-brand-card"><img src="https://images.unsplash.com/photo-1584917865442-de89df76afd3?auto=format&fit=crop&w=500&q=80" class="w-full h-full object-cover" loading="lazy" alt="Quality inspection"></div>
-
         <p class="mt-3 text-xs font-bold uppercase tracking-wide">4. Quality Inspection</p>
-
         <p class="text-xs text-brand-subtle mt-1">Every batch checked under bright-light review.</p>
-
       </div>
-
       <div>
-
         <div class="aspect-square rounded-xl overflow-hidden bg-brand-card"><img src="https://images.unsplash.com/photo-1553413077-190dd305871c?auto=format&fit=crop&w=500&q=80" class="w-full h-full object-cover" loading="lazy" alt="Packing and dispatch"></div>
-
         <p class="mt-3 text-xs font-bold uppercase tracking-wide">5. Packing &amp; Dispatch</p>
-
         <p class="text-xs text-brand-subtle mt-1">Securely packed, ready for pan-country logistics.</p>
-
       </div>
-
     </div>
-
   </div>
-
 </section>
-
 
 <!-- FAQ -->
-
 <section id="faq" class="reveal max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-14">
-
   <h2 class="font-sans font-extrabold uppercase tracking-tight text-h2 accent-underline mb-8">Frequently Asked Questions</h2>
-
   <div class="divide-y divide-black/10 border-t border-b border-black/10">
-
     <details class="group py-4">
-
       <summary class="flex items-center justify-between font-semibold text-sm">What is the minimum order quantity?
-
         <svg class="faq-arrow w-4 h-4 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
-
       </summary>
-
       <p class="text-sm text-brand-subtle mt-3">MOQ varies by style and is listed on each product card — typically between 30 and 200 pieces per colorway.</p>
-
     </details>
-
     <details class="group py-4">
-
       <summary class="flex items-center justify-between font-semibold text-sm">What fabrics are available?
-
         <svg class="faq-arrow w-4 h-4 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
-
       </summary>
-
       <p class="text-sm text-brand-subtle mt-3">Fabric composition and GSM are listed per product. For custom fabric sourcing outside our current range, message us directly on WhatsApp.</p>
-
     </details>
-
     <details class="group py-4">
-
       <summary class="flex items-center justify-between font-semibold text-sm">Can colors and designs be customized?
-
         <svg class="faq-arrow w-4 h-4 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
-
       </summary>
-
       <p class="text-sm text-brand-subtle mt-3">Yes — colorways, trims, and labeling can be customized for orders meeting the style's MOQ. Share your requirements over WhatsApp for a quote.</p>
-
     </details>
-
     <details class="group py-4">
-
       <summary class="flex items-center justify-between font-semibold text-sm">What is the production and lead time?
-
         <svg class="faq-arrow w-4 h-4 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
-
       </summary>
-
       <p class="text-sm text-brand-subtle mt-3">Standard lead time is 15–25 days ex-factory from order confirmation, depending on quantity and customization.</p>
-
     </details>
-
     <details class="group py-4">
-
       <summary class="flex items-center justify-between font-semibold text-sm">How does enquiry and ordering work?
-
         <svg class="faq-arrow w-4 h-4 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
-
       </summary>
-
       <p class="text-sm text-brand-subtle mt-3">Tap "Enquire on WhatsApp" on any product — it opens a chat pre-filled with that item's details, so our team can respond with pricing and next steps directly.</p>
-
     </details>
-
   </div>
-
 </section>
-
 
 <!-- FINAL CTA -->
-
 <section class="reveal bg-brand-card">
-
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14 text-center">
-
     <span class="text-xs font-bold uppercase tracking-widest text-brand-subtle">Final WhatsApp Conversion</span>
-
     <h2 class="mt-3 font-sans font-extrabold uppercase tracking-tight text-h2">Ready to Discuss Your Next Collection?</h2>
-
     <p class="text-sm text-brand-subtle mt-3 max-w-xl mx-auto">Our team is here to provide personalized guidance for your B2B needs. Connect directly via WhatsApp for a quick consultation.</p>
-
     <a id="finalWaBtn" href="#" target="_blank" rel="noopener" class="btn-motion inline-flex items-center gap-2 mt-6 px-7 py-3.5 bg-brand-dark text-white text-sm font-semibold rounded-lg hover:bg-black">
-
       <svg class="w-5 h-5 fill-current text-green-400" viewBox="0 0 24 24"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981z"/></svg>
-
       Start WhatsApp Enquiry
-
     </a>
-
   </div>
-
 </section>
 
-
 <!-- FOOTER -->
-
 <footer id="footer" class="bg-brand-dark text-white/80">
-
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 grid grid-cols-1 md:grid-cols-3 gap-8 text-sm">
-
     <div>
-
       <div class="flex items-center gap-2 text-white">
-
         <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2l2.4 7.2H22l-6 4.4 2.3 7.2L12 16.4 5.7 20.8 8 13.6l-6-4.4h7.6z"/></svg>
-
         <span class="font-serif italic font-semibold text-lg" id="footerLogo">Leaf Star</span>
-
       </div>
-
       <p class="mt-3 text-white/60 max-w-xs">Premium B2B apparel manufacturer supplying retailers, boutiques, and wholesalers.</p>
-
     </div>
-
     <div>
-
       <p class="font-semibold text-white mb-2">Contact</p>
-
       <p class="text-white/60" id="footerWhatsapp">WhatsApp: +91 XXXXX XXXXX</p>
-
       <p class="text-white/60">Email: sales@yourbusiness.com</p>
-
       <p class="text-white/60 mt-2">Address line, City, State, PIN</p>
-
     </div>
-
     <div>
-
       <p class="font-semibold text-white mb-2">Follow</p>
-
       <p class="text-white/60">LinkedIn · Instagram · Twitter</p>
-
     </div>
-
   </div>
-
   <div class="border-t border-white/10 text-center text-xs text-white/40 py-5">© 2026 — All rights reserved. Wholesale enquiries only.</div>
-
 </footer>
 
-
 <!-- SHOWROOM MODAL -->
-
 <div id="showroomModal" class="fixed inset-0 z-50 bg-black/85 hidden items-center justify-center sm:p-4">
-
   <button onclick="closeShowroom()" class="fixed top-3 right-3 z-[70] bg-black/60 hover:bg-black text-white p-2 rounded-full transition-colors">
-
     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
-
   </button>
-
   <div class="bg-white w-full h-full sm:h-auto sm:max-w-5xl sm:rounded-2xl shadow-2xl relative sm:max-h-[95vh] overflow-y-auto">
-
     <div class="grid grid-cols-1 md:grid-cols-[7fr_5fr] md:gap-6 md:items-start md:p-6">
-
-
       <!-- Image column -->
-
       <div class="md:sticky md:top-6 bg-brand-card md:rounded-xl md:border md:border-black/10 overflow-hidden flex flex-col gap-3 md:gap-4 md:p-4">
-
         <div class="w-full aspect-[4/3] border-b sm:border border-black/10 sm:rounded-lg overflow-hidden bg-white relative cursor-zoom-in" id="modalImgWrap">
-
           <div id="modalTrack" class="flex h-full" style="transition:transform 320ms cubic-bezier(.22,.61,.36,1);"></div>
-
           <span class="absolute bottom-3 right-3 bg-black/70 text-white text-[10px] font-semibold px-2.5 py-1.5 rounded-full pointer-events-none">Tap to zoom · swipe for more</span>
-
           <button id="prevImgBtn" class="absolute left-2 top-1/2 -translate-y-1/2 zoom-btn !w-9 !h-9 z-10">‹</button>
-
           <button id="nextImgBtn" class="absolute right-2 top-1/2 -translate-y-1/2 zoom-btn !w-9 !h-9 z-10">›</button>
-
         </div>
-
         <div class="flex gap-3 overflow-x-auto thumb-scroll px-4 md:px-0 pb-2 md:pb-0" id="thumbnailDeck"></div>
-
       </div>
-
 
       <!-- Details column -->
-
       <div class="p-5 md:p-0 flex flex-col gap-5 bg-white">
-
         <div class="space-y-3">
-
           <div>
-
             <span class="text-[10px] font-bold font-mono tracking-widest text-brand-subtle uppercase" id="modalSku">#STYLE</span>
-
             <h2 class="text-h3 font-bold font-serif text-brand-dark" id="modalTitle">Product Name</h2>
-
             <span class="inline-block mt-2 text-xs font-bold px-2.5 py-1 rounded border" id="modalStatusBadge">Active</span>
-
           </div>
-
-          <!-- Non-clickable visual color dots in modal -->
-
           <div id="modalColors" class="flex items-center gap-2 pointer-events-none"></div>
-
           <p class="text-body text-brand-subtle" id="modalDesc"></p>
-
           <div class="grid grid-cols-2 gap-3 border-t border-b border-black/10 py-4 text-xs">
-
             <div><span class="text-brand-subtle block">Fabric</span><span class="font-bold" id="modalFabric">--</span></div>
-
             <div><span class="text-brand-subtle block">Weave / GSM</span><span class="font-bold" id="modalGsm">--</span></div>
-
             <div><span class="text-brand-subtle block">MOQ Target</span><span class="font-bold" id="modalMoq">--</span></div>
-
             <div><span class="text-brand-subtle block">Sizes / Specs</span><span class="font-bold" id="modalShades">--</span></div>
-
           </div>
-
         </div>
-
         <a id="modalWaBtn" href="#" target="_blank" rel="noopener"
-
            class="btn-motion w-full py-4 bg-brand-dark text-white rounded-xl font-bold text-xs flex items-center justify-center gap-2 hover:bg-black shadow-md">
-
           <svg class="w-5 h-5 fill-current text-green-400" viewBox="0 0 24 24"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981z"/></svg>
-
           Enquire on WhatsApp
-
         </a>
-
       </div>
-
     </div>
-
   </div>
-
 </div>
-
 
 <!-- FULLSCREEN ZOOM LAYER -->
-
 <div id="fullscreenZoom" class="fixed inset-0 z-[60] bg-black hidden items-center justify-center">
-
   <button onclick="closeFullscreenZoom()" class="absolute top-4 right-4 z-30 bg-white/15 hover:bg-white/25 text-white p-2.5 rounded-full transition-colors">
-
     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
-
   </button>
-
-  <p class="absolute top-5 left-1/2 -translate-x-1/2 text-white/70 text-[11px] font-medium text-center px-4">Pinch/scroll to zoom · drag to pan · swipe for next · double-tap to reset</p>
-
+  <p class="absolute top-5 left-1/2 -translate-x-1/2 text-white/70 text-[11px] font-medium text-center px-4 pointer-events-none">Pinch to zoom · drag to inspect · double-tap to zoom/reset</p>
   <div class="w-full h-full flex items-center justify-center overflow-hidden" id="fsZoomContainer">
-
     <div class="fs-frame" id="fsFrame">
-
       <img id="fsZoomImg" src="" alt="" class="block max-w-full max-h-full object-contain">
-
     </div>
-
   </div>
-
 </div>
-
 
 <script>
 /* =========================================================
    CONFIGURATIONS & CONSTANTS
    ========================================================= */
 const API_PROXY_URL = "/api/get-products"; 
-const REFRESH_INTERVAL_MS = 60 * 60 * 1000; // 60 minutes auto-refresh
+const REFRESH_INTERVAL_MS = 60 * 60 * 1000;
 
 const SITE_NAME = "Leaf Star";
 document.getElementById('siteLogo').textContent = SITE_NAME;
 document.getElementById('footerLogo').textContent = SITE_NAME;
 
-// We declare this as a variable now, but leave it empty.
-// It will be securely populated by the backend.
 let dynamicWaNumber = ""; 
 
-// Category -> Section Mapping
 const CATEGORY_SECTION_MAP = {
   'shirts': 'Upperwear', 'jackets': 'Upperwear', 'hoodies': 'Upperwear', 
   't-shirts': 'Upperwear', 'tshirts': 'Upperwear', 'polos': 'Upperwear', 
@@ -699,13 +371,38 @@ const CATEGORY_SECTION_MAP = {
   'pants': 'Lowerwear', 'cargos': 'Lowerwear'
 };
 
+/* Extended Case-Insensitive Color Map */
 const COLOR_MAP = {
-  'black': '#1A1A1A', 'navy': '#1F2D3D', 'rust': '#8C4A2F', 'white': '#FFFFFF',
-  'grey': '#808080', 'gray': '#808080', 'beige': '#F5F5DC', 'olive': '#556B2F',
-  'blue': '#2196F3', 'red': '#E53935', 'green': '#2E7D32', 'yellow': '#FBC02D',
-  'brown': '#6D4C41', 'maroon': '#800000', 'pink': '#E91E63', 'purple': '#9C27B0',
-  'cream': '#FFFDD0', 'charcoal': '#36454F', 'tan': '#D2B48C', 'khaki': '#C3B091'
+  'black': '#1A1A1A', 'navy': '#1F2D3D', 'navy blue': '#1F2D3D', 'rust': '#8C4A2F', 
+  'white': '#FFFFFF', 'grey': '#808080', 'gray': '#808080', 'light grey': '#D3D3D3', 
+  'dark grey': '#A9A9A9', 'beige': '#F5F5DC', 'olive': '#556B2F', 'olive green': '#556B2F',
+  'blue': '#2196F3', 'sky blue': '#87CEEB', 'light blue': '#ADD8E6', 'dark blue': '#00008B',
+  'red': '#E53935', 'green': '#2E7D32', 'light green': '#90EE90', 'bottle green': '#006A4E',
+  'yellow': '#FBC02D', 'mustard': '#FFDB58', 'brown': '#6D4C41', 'maroon': '#800000', 
+  'wine': '#722F37', 'pink': '#E91E63', 'baby pink': '#F4C2C2', 'purple': '#9C27B0', 
+  'cream': '#FFFDD0', 'off white': '#FAF9F6', 'charcoal': '#36454F', 'tan': '#D2B48C', 
+  'khaki': '#C3B091', 'orange': '#FF9800', 'pista': '#93C572', 'peach': '#FFDAB9',
+  'lavender': '#E6E6FA', 'mint': '#98FF98', 'cyan': '#00FFFF', 'teal': '#008080'
 };
+
+function getColorHex(colorName) {
+  if (!colorName) return '#CCCCCC';
+  const str = String(colorName).trim();
+  const lower = str.toLowerCase();
+
+  if (lower.startsWith('#') || lower.startsWith('rgb') || lower.startsWith('hsl')) {
+    return str;
+  }
+  if (COLOR_MAP[lower]) {
+    return COLOR_MAP[lower];
+  }
+  for (const [key, hex] of Object.entries(COLOR_MAP)) {
+    if (lower.includes(key)) {
+      return hex;
+    }
+  }
+  return '#CCCCCC';
+}
 
 let catalogSections = { 'Upperwear': {}, 'Lowerwear': {} };
 let flatProductsList = [];
@@ -717,7 +414,6 @@ const explorerGrid = document.getElementById('explorerGrid');
 function slug(s){ return (s || '').toLowerCase().replace(/[^a-z0-9]+/g,'-'); }
 
 /* ================= WHATSAPP LINK GENERATION ================= */
-// Generates links securely only after the backend provides the number
 function setupGenericWaLinks() {
   const genericWaLink = `https://wa.me/${dynamicWaNumber}?text=${encodeURIComponent("Hi, I'm a retailer interested in your wholesale catalogue. Could you share more details?")}`;
   
@@ -747,8 +443,6 @@ async function fetchAirtableCatalog() {
     }
     
     const data = await response.json();
-    
-    // Securely assign the WhatsApp number fetched from the server
     dynamicWaNumber = data.businessNumber || "910000000000"; 
     setupGenericWaLinks();
     
@@ -769,29 +463,63 @@ function parseAirtableData(records) {
   catalogSections = { 'Upperwear': {}, 'Lowerwear': {} };
   flatProductsList = [];
 
+  if (!Array.isArray(records) || records.length === 0) {
+    renderExplorer();
+    renderCatalog();
+    return;
+  }
+
   records.forEach((rec, idx) => {
     const f = rec.fields || {};
-    const name = f['Product Name'] || f['Name'] || 'Unnamed Product';
-    const cat = f['Category'] || 'General';
-    
-    let sec = f['Section'];
-    if (!sec) sec = CATEGORY_SECTION_MAP[(cat || '').trim().toLowerCase()] || 'Upperwear';
-    sec = sec.charAt(0).toUpperCase() + sec.slice(1).toLowerCase();
-    if (sec !== 'Upperwear' && sec !== 'Lowerwear') sec = CATEGORY_SECTION_MAP[(cat || '').trim().toLowerCase()] || 'Upperwear';
 
-    let imgList = [];
-    if (Array.isArray(f['Images']) && f['Images'].length > 0) {
-      imgList = f['Images'].map(img => typeof img === 'string' ? img : (img?.url || ''));
-    } else if (typeof f['Images'] === 'string' && f['Images'].trim().length > 0) {
-      imgList = [f['Images']];
-    } else {
-      imgList = ['https://images.unsplash.com/photo-1521572267360-ee0c2909d518?auto=format&fit=crop&w=600&q=80'];
+    const rawName = (f['Product Name'] || f['Name'] || f['Title'] || '').trim();
+    const rawCat = (f['Category'] || f['Type'] || '').trim();
+    const rawImages = f['Images'] || f['Photos'] || f['Attachment'];
+
+    // Strict Check: Skip empty/unmanufactured rows completely
+    if (!rawName && !rawCat && !rawImages) {
+      return; 
     }
 
-    const rawColours = f['Colours'] || f['Colors'] || '';
-    const colorNames = typeof rawColours === 'string' 
-      ? rawColours.split(',').map(c => c.trim()).filter(Boolean)
-      : (Array.isArray(rawColours) ? rawColours : []);
+    // 3. IMAGES (Optimized for Thumbnails vs High-Res)
+    let imgList = [];
+    if (Array.isArray(rawImages) && rawImages.length > 0) {
+      imgList = rawImages.map(img => {
+        if (typeof img === 'string') return { thumb: img, full: img };
+        return {
+          thumb: img?.thumbnails?.large?.url || img?.url || '',
+          full: img?.url || ''
+        };
+      }).filter(img => img.full); // Keep only valid images
+    } else if (typeof rawImages === 'string' && rawImages.trim().length > 0) {
+      imgList = [{ thumb: rawImages, full: rawImages }];
+    }
+
+    // FIX ISSUE 1: Do not load generic t-shirts. Ignore product if there's no real image.
+    if (imgList.length === 0) {
+      return; 
+    }
+
+    const name = rawName || 'Manufactured Item';
+    const cat = rawCat || 'General';
+
+    let sec = CATEGORY_SECTION_MAP[cat.toLowerCase()] || 'Upperwear';
+    sec = sec.charAt(0).toUpperCase() + sec.slice(1).toLowerCase();
+
+    // 4. COLOURS AVAILABLE (Case-insensitive parsing)
+    let colorNames = [];
+    const rawColours = f['Colours Available'] || f['Colours'] || f['Colours '] || f['Colors'] || f['Color'] || f['Shades'] || '';
+    if (Array.isArray(rawColours)) {
+      colorNames = rawColours.map(c => typeof c === 'string' ? c : (c?.name || c?.value || '')).filter(Boolean);
+    } else if (typeof rawColours === 'string' && rawColours.trim().length > 0) {
+      colorNames = rawColours.split(/[,;/]+/).map(c => c.trim()).filter(Boolean);
+    }
+
+    // 5. SIZES
+    const rawSizes = f['Sizes'] || f['Size'] || f['Size Range'];
+    const sizeString = Array.isArray(rawSizes) 
+      ? rawSizes.map(s => typeof s === 'string' ? s : (s?.name || '')).filter(Boolean).join(', ') 
+      : (typeof rawSizes === 'string' ? rawSizes : 'Standard Sizes');
 
     const product = {
       id: rec.id || `rec-${idx}`,
@@ -799,13 +527,13 @@ function parseAirtableData(records) {
       name: name,
       section: sec,
       category: cat,
-      fabric: f['Fabric'] || 'Standard Cotton',
+      fabric: f['Fabric'] || 'Specified Fabric',
       gsm: f['GSM'] || f['Weave'] || 'Standard GSM',
       moq: f['MOQ'] ? `${f['MOQ']} pcs` : '50 pcs',
-      shades: f['Sizes'] ? (Array.isArray(f['Sizes']) ? f['Sizes'].join(', ') : f['Sizes']) : 'S, M, L, XL',
+      shades: sizeString,
       colours: colorNames,
-      desc: f['Description'] || f['desc'] || '',
-      images: imgList,
+      desc: f['Description'] || f['desc'] || `Manufactured ${cat.toLowerCase()} in high quality ${f['Fabric'] || 'fabric'}.`,
+      images: imgList, // Now contains {thumb, full} objects
       status: f['Status'] || 'Active'
     };
 
@@ -817,14 +545,15 @@ function parseAirtableData(records) {
   });
 
   if (flatProductsList.length > 0 && flatProductsList[0].images.length > 0) {
-    document.getElementById('heroImg').src = flatProductsList[0].images[0];
+    const heroEl = document.getElementById('heroImg');
+    heroEl.src = flatProductsList[0].images[0].full;
+    heroEl.classList.remove('hidden');
   }
 
   renderExplorer();
   renderCatalog();
   observeReveals();
 }
-
 
 /* ================= DOM RENDERING FUNCTIONS ================= */
 function renderExplorer() {
@@ -837,7 +566,7 @@ function renderExplorer() {
     let sampleImg = '';
     for (const catArr of Object.values(categories)) {
       if (catArr.length > 0 && catArr[0].images.length > 0) {
-        sampleImg = catArr[0].images[0];
+        sampleImg = catArr[0].images[0].thumb; // Use fast thumbnail
         break;
       }
     }
@@ -858,6 +587,12 @@ function renderExplorer() {
 
 function renderCatalog() {
   root.innerHTML = '';
+
+  if (flatProductsList.length === 0) {
+    root.innerHTML = '<p class="text-center py-16 text-brand-subtle font-mono text-sm">No manufactured products found in database.</p>';
+    return;
+  }
+
   ['Upperwear', 'Lowerwear'].forEach(secName => {
     const categories = catalogSections[secName] || {};
     const catKeys = Object.keys(categories);
@@ -889,11 +624,11 @@ function renderCatalog() {
         card.className = "card-hover bg-white rounded-2xl overflow-hidden border border-black/5 shadow-sm flex flex-col";
         card.dataset.search = (p.name + ' ' + p.fabric + ' ' + p.category + ' ' + p.section + ' ' + p.sku).toLowerCase();
 
-        // Image Wrap
+        // Image Wrap uses THUMBNAIL for lightning fast loading
         const imgWrap = document.createElement('div');
         imgWrap.className = "aspect-[4/3] bg-brand-card relative cursor-pointer group";
         imgWrap.innerHTML = `
-          <img src="${p.images[0]}" alt="${p.name}" loading="lazy" decoding="async" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+          <img src="${p.images[0].thumb}" alt="${p.name}" loading="lazy" decoding="async" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
           <span class="absolute top-3 left-3 text-caption font-bold px-2 py-1 border rounded bg-emerald-50 text-emerald-800 border-emerald-200">Active</span>
           <div class="absolute bottom-3 left-3 right-3 bg-brand-dark/85 text-white text-caption font-medium px-3 py-1.5 rounded-md backdrop-blur-sm flex items-center gap-2">
             <svg class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7"/></svg> Tap to inspect & zoom
@@ -915,12 +650,12 @@ function renderCatalog() {
 
         if (p.colours && p.colours.length > 0) {
           const colorsDiv = document.createElement('div');
-          colorsDiv.className = "flex items-center gap-1.5 pt-1 pointer-events-none";
+          colorsDiv.className = "flex items-center gap-1.5 pt-1 pointer-events-none flex-wrap";
           colorsDiv.innerHTML = `<span class="text-caption text-brand-subtle mr-1 font-mono">Colours:</span>`;
           p.colours.forEach(colorName => {
-            const hex = COLOR_MAP[colorName.toLowerCase()] || '#CCCCCC';
+            const hex = getColorHex(colorName);
             const dot = document.createElement('span');
-            dot.className = "inline-block w-3.5 h-3.5 rounded-full border border-black/15 shadow-sm pointer-events-none";
+            dot.className = "inline-block w-3.5 h-3.5 rounded-full border border-black/15 shadow-sm pointer-events-none shrink-0";
             dot.style.backgroundColor = hex;
             dot.title = colorName;
             colorsDiv.appendChild(dot);
@@ -1001,9 +736,10 @@ function buildTrack(){
   const p = flatProductsList[curProdIndex];
   if(!p) return;
   modalTrack.innerHTML = '';
-  p.images.forEach(imgUrl => {
+  p.images.forEach(imgObj => {
     const img = document.createElement('img');
-    img.src = imgUrl; img.alt = p.name;
+    img.src = imgObj.full; // Modal preloads full resolution for zooming
+    img.alt = p.name;
     modalTrack.appendChild(img);
   });
   modalTrack.style.transition = 'none';
@@ -1020,7 +756,7 @@ function renderModalInfo(){
 
   document.getElementById('modalSku').textContent = p.sku;
   document.getElementById('modalTitle').textContent = p.name;
-  document.getElementById('modalDesc').textContent = p.desc || `Premium ${p.category.toLowerCase()} manufactured with high-quality ${p.fabric}. Tailored for wholesale and bulk B2B distribution.`;
+  document.getElementById('modalDesc').textContent = p.desc || `Manufactured ${p.category.toLowerCase()} crafted from premium ${p.fabric}.`;
   document.getElementById('modalFabric').textContent = p.fabric;
   document.getElementById('modalGsm').textContent = p.gsm;
   document.getElementById('modalMoq').textContent = p.moq;
@@ -1036,13 +772,13 @@ function renderModalInfo(){
   colorsWrap.innerHTML = '';
   if(p.colours && p.colours.length > 0){
     const cDiv = document.createElement('div');
-    cDiv.className = "flex items-center gap-2 pointer-events-none";
+    cDiv.className = "flex items-center gap-2 pointer-events-none flex-wrap";
     cDiv.innerHTML = `<span class="text-xs text-brand-subtle font-mono">Colours:</span>`;
     p.colours.forEach(cName => {
-      const hex = COLOR_MAP[cName.toLowerCase()] || '#CCCCCC';
+      const hex = getColorHex(cName);
       const dot = document.createElement('span');
       dot.title = cName;
-      dot.className = "w-5 h-5 rounded-full border border-black/15 shadow-sm inline-block";
+      dot.className = "w-5 h-5 rounded-full border border-black/15 shadow-sm inline-block shrink-0";
       dot.style.background = hex;
       cDiv.appendChild(dot);
     });
@@ -1055,10 +791,10 @@ function renderModalInfo(){
 
   const deck = document.getElementById('thumbnailDeck');
   deck.innerHTML = '';
-  p.images.forEach((imgUrl, i) => {
+  p.images.forEach((imgObj, i) => {
     const thumbWrap = document.createElement('div');
     thumbWrap.className = `w-16 h-16 rounded-lg overflow-hidden border-2 cursor-pointer transition-all flex-shrink-0 ${i===curImg?'border-brand-dark':'border-transparent opacity-60 hover:opacity-100'}`;
-    thumbWrap.innerHTML = `<img src="${imgUrl}" loading="lazy" class="w-full h-full object-cover">`;
+    thumbWrap.innerHTML = `<img src="${imgObj.thumb}" loading="lazy" class="w-full h-full object-cover">`;
     deck.appendChild(thumbWrap);
     thumbWrap.addEventListener('click', () => {
       curImg = i;
@@ -1076,7 +812,7 @@ function navImg(dir){
   modalTrack.style.transition = 'transform 320ms cubic-bezier(.22,.61,.36,1)';
   setTrackPosition();
   renderModalInfo();
-  if(!fsZoom.classList.contains('hidden')){ fsImg.src = p.images[curImg]; springResetFs(); }
+  if(!fsZoom.classList.contains('hidden')){ fsImg.src = p.images[curImg].full; resetFsZoom(false); }
 }
 
 document.getElementById('prevImgBtn').addEventListener('click', e => { e.stopPropagation(); navImg(-1); });
@@ -1122,93 +858,215 @@ modalImgWrap.addEventListener('touchend', () => {
 }, {passive:true});
 modalImgWrap.addEventListener('click', () => { if(!trackWasDragged) openFullscreenZoom(); });
 
-/* ================= FULLSCREEN ZOOM ================= */
+/* ================= FULLSCREEN INSTAGRAM-STYLE ZOOM ================= */
 const fsZoom = document.getElementById('fullscreenZoom');
 const fsImg = document.getElementById('fsZoomImg');
 const fsFrame = document.getElementById('fsFrame');
 const fsContainer = document.getElementById('fsZoomContainer');
-let scale=1, panX=0, panY=0, dragging=false, lastX=0, lastY=0;
-let zoomSource=null;
+
+let scale = 1, panX = 0, panY = 0;
+let isInteracting = false, isPanning = false;
+let startScale = 1, startPanX = 0, startPanY = 0;
+let startTouchDist = 0;
+let startTouchCenter = { x: 0, y: 0 };
+let lastTapTime = 0;
+let panStartX = 0, panStartY = 0;
 
 function openFullscreenZoom(){
   const p = flatProductsList[curProdIndex];
-  if(!p) return;
-  fsImg.src = p.images[curImg];
-  springResetFs();
-  fsZoom.classList.remove('hidden'); fsZoom.classList.add('flex');
+  if(!p || !p.images || !p.images[curImg]) return;
+  fsImg.src = p.images[curImg].full; // Ensure we request full-res in zoom mode
+  resetFsZoom(false);
+  fsZoom.classList.remove('hidden'); 
+  fsZoom.classList.add('flex');
 }
-function closeFullscreenZoom(){ fsZoom.classList.add('hidden'); fsZoom.classList.remove('flex'); }
-function applyTransform(){
-  fsImg.style.transform = `translate(${panX}px,${panY}px) scale(${scale})`;
-  fsFrame.classList.toggle('zoomed', scale > 1.01);
+
+function closeFullscreenZoom(){ 
+  fsZoom.classList.add('hidden'); 
+  fsZoom.classList.remove('flex'); 
+  resetFsZoom(false);
 }
-function setTransformInstant(){ fsImg.style.transition = 'none'; applyTransform(); }
-function setTransformEased(springy=false){
-  fsImg.style.transition = springy ? 'transform 420ms cubic-bezier(.34,1.56,.64,1)' : 'transform 260ms cubic-bezier(.22,.61,.36,1)';
-  applyTransform();
+
+function resetFsZoom(animate = true){
+  scale = 1; panX = 0; panY = 0;
+  applyFsTransform(animate);
 }
-function springResetFs(){ scale=1; panX=0; panY=0; zoomSource=null; setTransformEased(); }
+
+function applyFsTransform(animate = false){
+  if(animate){
+    fsImg.style.transition = 'transform 320ms cubic-bezier(0.25, 1, 0.5, 1)';
+  } else {
+    fsImg.style.transition = 'none';
+  }
+  fsImg.style.transform = `translate3d(${panX}px, ${panY}px, 0) scale(${scale})`;
+  if(fsFrame){
+    fsFrame.classList.toggle('zoomed', scale > 1.01);
+  }
+}
+
+function clampPan(){
+  if(scale <= 1){
+    panX = 0; panY = 0;
+    return;
+  }
+  const rect = fsImg.getBoundingClientRect();
+  const containerRect = fsContainer.getBoundingClientRect();
+  
+  const maxPanX = Math.max(0, (rect.width - containerRect.width) / 2 + 20);
+  const maxPanY = Math.max(0, (rect.height - containerRect.height) / 2 + 20);
+
+  panX = Math.min(Math.max(panX, -maxPanX), maxPanX);
+  panY = Math.min(Math.max(panY, -maxPanY), maxPanY);
+}
+
+fsContainer.addEventListener('touchstart', e => {
+  if (e.touches.length === 2) {
+    isInteracting = true;
+    startScale = scale;
+    startPanX = panX;
+    startPanY = panY;
+    startTouchDist = Math.hypot(
+      e.touches[0].clientX - e.touches[1].clientX,
+      e.touches[0].clientY - e.touches[1].clientY
+    );
+    startTouchCenter = {
+      x: (e.touches[0].clientX + e.touches[1].clientX) / 2,
+      y: (e.touches[0].clientY + e.touches[1].clientY) / 2
+    };
+  } else if (e.touches.length === 1) {
+    const now = Date.now();
+    const touch = e.touches[0];
+    
+    // Double-tap check fix for jitter
+    if (now - lastTapTime < 300) {
+      e.preventDefault();
+      if (scale > 1.1) {
+        resetFsZoom(true);
+      } else {
+        scale = 2.5;
+        const containerRect = fsContainer.getBoundingClientRect();
+        const tapX = touch.clientX - (containerRect.left + containerRect.width / 2);
+        const tapY = touch.clientY - (containerRect.top + containerRect.height / 2);
+        panX = -tapX * 1.2;
+        panY = -tapY * 1.2;
+        clampPan();
+        applyFsTransform(true);
+      }
+      lastTapTime = 0;
+      return;
+    }
+    lastTapTime = now;
+
+    // Only allow panning if not currently triggering a double tap reset
+    if (scale > 1) {
+      isPanning = true;
+      panStartX = touch.clientX - panX;
+      panStartY = touch.clientY - panY;
+    }
+  }
+}, { passive: false });
+
+fsContainer.addEventListener('touchmove', e => {
+  if (e.touches.length === 2 && isInteracting) {
+    e.preventDefault();
+    const dist = Math.hypot(
+      e.touches[0].clientX - e.touches[1].clientX,
+      e.touches[0].clientY - e.touches[1].clientY
+    );
+    const newScale = Math.min(Math.max(startScale * (dist / startTouchDist), 0.8), 6);
+    
+    const currentCenter = {
+      x: (e.touches[0].clientX + e.touches[1].clientX) / 2,
+      y: (e.touches[0].clientY + e.touches[1].clientY) / 2
+    };
+    
+    const dx = currentCenter.x - startTouchCenter.x;
+    const dy = currentCenter.y - startTouchCenter.y;
+    
+    scale = newScale;
+    panX = startPanX + dx;
+    panY = startPanY + dy;
+    applyFsTransform(false);
+  } else if (e.touches.length === 1 && isPanning && scale > 1) {
+    e.preventDefault();
+    const touch = e.touches[0];
+    panX = touch.clientX - panStartX;
+    panY = touch.clientY - panStartY;
+    applyFsTransform(false);
+  }
+}, { passive: false });
+
+fsContainer.addEventListener('touchend', () => {
+  if (isInteracting || isPanning) {
+    isInteracting = false;
+    isPanning = false;
+    
+    // Smooth Release Drop Transition
+    if (scale < 1) {
+      resetFsZoom(true);
+    } else if (scale > 5) {
+      scale = 5;
+      clampPan();
+      applyFsTransform(true);
+    } else {
+      clampPan();
+      applyFsTransform(true);
+    }
+  }
+});
 
 fsContainer.addEventListener('wheel', e => {
   e.preventDefault();
-  scale = Math.min(Math.max(scale + (e.deltaY<0?0.3:-0.3), 1), 5);
-  if(scale===1){panX=0;panY=0;}
-  setTransformEased();
-}, {passive:false});
-fsImg.addEventListener('dblclick', () => {
-  scale = scale===1 ? 2.5 : 1;
-  if(scale===1){panX=0;panY=0;}
-  setTransformEased(true);
-});
-fsImg.addEventListener('mousedown', e => { if(scale===1) return; dragging=true; lastX=e.clientX; lastY=e.clientY; fsImg.classList.add('grabbing'); });
-window.addEventListener('mousemove', e => { if(!dragging) return; panX+=e.clientX-lastX; panY+=e.clientY-lastY; lastX=e.clientX; lastY=e.clientY; setTransformInstant(); });
-window.addEventListener('mouseup', () => { dragging=false; fsImg.classList.remove('grabbing'); });
+  const delta = e.deltaY < 0 ? 0.35 : -0.35;
+  scale = Math.min(Math.max(scale + delta, 1), 5);
+  if (scale === 1) {
+    panX = 0; panY = 0;
+  } else {
+    clampPan();
+  }
+  applyFsTransform(true);
+}, { passive: false });
 
-let pinchStartDist=0, pinchStartScale=1, lastTap=0;
-let fsTouchStartX=0, fsTouchStartY=0, fsSwiping=false;
-fsContainer.addEventListener('touchstart', e => {
-  if(e.touches.length===2){
-    pinchStartDist = Math.hypot(e.touches[0].clientX-e.touches[1].clientX, e.touches[0].clientY-e.touches[1].clientY);
-    pinchStartScale = scale;
-    if(!zoomSource) zoomSource = 'pinch';
-  } else if(e.touches.length===1){
-    const now = Date.now();
-    if(now - lastTap < 300){
-      scale = scale===1 ? 2.5 : 1;
-      zoomSource = scale>1 ? 'doubletap' : null;
-      if(scale===1){panX=0;panY=0;}
-      setTransformEased(true);
-    }
-    lastTap = now;
-    if(scale>1){ dragging=true; lastX=e.touches[0].clientX; lastY=e.touches[0].clientY; }
-    else { fsSwiping = true; fsTouchStartX = e.touches[0].clientX; fsTouchStartY = e.touches[0].clientY; }
+fsImg.addEventListener('dblclick', e => {
+  if (scale > 1.1) {
+    resetFsZoom(true);
+  } else {
+    scale = 2.5;
+    const containerRect = fsContainer.getBoundingClientRect();
+    const tapX = e.clientX - (containerRect.left + containerRect.width / 2);
+    const tapY = e.clientY - (containerRect.top + containerRect.height / 2);
+    panX = -tapX * 1.2;
+    panY = -tapY * 1.2;
+    clampPan();
+    applyFsTransform(true);
   }
-}, {passive:true});
-fsContainer.addEventListener('touchmove', e => {
-  if(e.touches.length===2){
-    const dist = Math.hypot(e.touches[0].clientX-e.touches[1].clientX, e.touches[0].clientY-e.touches[1].clientY);
-    scale = Math.min(Math.max(pinchStartScale * (dist/pinchStartDist), 1), 5);
-    setTransformInstant();
-  } else if(dragging && e.touches.length===1){
-    panX += e.touches[0].clientX-lastX; panY += e.touches[0].clientY-lastY;
-    lastX=e.touches[0].clientX; lastY=e.touches[0].clientY; setTransformInstant();
+});
+
+let isMouseDown = false;
+fsImg.addEventListener('mousedown', e => {
+  if (scale > 1) {
+    isMouseDown = true;
+    panStartX = e.clientX - panX;
+    panStartY = e.clientY - panY;
+    fsImg.classList.add('grabbing');
   }
-}, {passive:true});
-fsContainer.addEventListener('touchend', e => {
-  if(e.touches.length===0 && zoomSource==='pinch'){ springResetFs(); }
-  if(fsSwiping && scale===1 && e.changedTouches.length){
-    const dx = e.changedTouches[0].clientX - fsTouchStartX;
-    const dy = e.changedTouches[0].clientY - fsTouchStartY;
-    if(Math.abs(dx) > 45 && Math.abs(dx) > Math.abs(dy)*1.5){
-      const p = flatProductsList[curProdIndex];
-      if(p){
-        curImg = (curImg + (dx<0?1:-1) + p.images.length) % p.images.length;
-        renderModalInfo();
-        fsImg.src = p.images[curImg];
-      }
-    }
+});
+
+window.addEventListener('mousemove', e => {
+  if (isMouseDown && scale > 1) {
+    panX = e.clientX - panStartX;
+    panY = e.clientY - panStartY;
+    applyFsTransform(false);
   }
-  fsSwiping = false; dragging = false;
+});
+
+window.addEventListener('mouseup', () => {
+  if (isMouseDown) {
+    isMouseDown = false;
+    fsImg.classList.remove('grabbing');
+    clampPan(); // FIX: Desktop dragging now properly snaps back into the borders
+    applyFsTransform(true);
+  }
 });
 
 /* ================= INITIALIZATION & 60-MIN AUTO-REFRESH ================= */
@@ -1222,7 +1080,5 @@ document.addEventListener('DOMContentLoaded', () => {
   }, REFRESH_INTERVAL_MS);
 });
 </script>
-
 </body>
-
 </html>
