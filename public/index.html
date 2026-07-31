@@ -472,6 +472,12 @@ function parseAirtableData(records) {
   records.forEach((rec, idx) => {
     const f = rec.fields || {};
 
+    // 1. STATUS FILTER (FIX: Ignore anything that is not Active)
+    const rawStatus = (f['Status'] || 'Active').trim();
+    if (rawStatus.toLowerCase() !== 'active') {
+      return; // Skip Sold Out, Archived, or Inactive items completely
+    }
+
     const rawName = (f['Product Name'] || f['Name'] || f['Title'] || '').trim();
     const rawCat = (f['Category'] || f['Type'] || '').trim();
     const rawImages = f['Images'] || f['Photos'] || f['Attachment'];
@@ -481,7 +487,7 @@ function parseAirtableData(records) {
       return; 
     }
 
-    // 3. IMAGES (Optimized for Thumbnails vs High-Res)
+    // 2. IMAGES (Optimized for Thumbnails vs High-Res)
     let imgList = [];
     if (Array.isArray(rawImages) && rawImages.length > 0) {
       imgList = rawImages.map(img => {
@@ -495,7 +501,7 @@ function parseAirtableData(records) {
       imgList = [{ thumb: rawImages, full: rawImages }];
     }
 
-    // FIX ISSUE 1: Do not load generic t-shirts. Ignore product if there's no real image.
+    // Ignore product if there's no real image attached
     if (imgList.length === 0) {
       return; 
     }
@@ -506,7 +512,7 @@ function parseAirtableData(records) {
     let sec = CATEGORY_SECTION_MAP[cat.toLowerCase()] || 'Upperwear';
     sec = sec.charAt(0).toUpperCase() + sec.slice(1).toLowerCase();
 
-    // 4. COLOURS AVAILABLE (Case-insensitive parsing)
+    // 3. COLOURS AVAILABLE (Case-insensitive parsing)
     let colorNames = [];
     const rawColours = f['Colours Available'] || f['Colours'] || f['Colours '] || f['Colors'] || f['Color'] || f['Shades'] || '';
     if (Array.isArray(rawColours)) {
@@ -515,7 +521,7 @@ function parseAirtableData(records) {
       colorNames = rawColours.split(/[,;/]+/).map(c => c.trim()).filter(Boolean);
     }
 
-    // 5. SIZES
+    // 4. SIZES
     const rawSizes = f['Sizes'] || f['Size'] || f['Size Range'];
     const sizeString = Array.isArray(rawSizes) 
       ? rawSizes.map(s => typeof s === 'string' ? s : (s?.name || '')).filter(Boolean).join(', ') 
@@ -533,8 +539,8 @@ function parseAirtableData(records) {
       shades: sizeString,
       colours: colorNames,
       desc: f['Description'] || f['desc'] || `Manufactured ${cat.toLowerCase()} in high quality ${f['Fabric'] || 'fabric'}.`,
-      images: imgList, // Now contains {thumb, full} objects
-      status: f['Status'] || 'Active'
+      images: imgList,
+      status: rawStatus
     };
 
     if (!catalogSections[sec]) catalogSections[sec] = {};
